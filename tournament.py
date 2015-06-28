@@ -13,7 +13,7 @@ def createTournament(num):
     """Creates a new tournament and returns the tournament id"""
     conn = connect()
     c = conn.cursor()
-    c.execute("insert into tournaments(number_of_players) values (%s)", 
+    c.execute("insert into tournaments(number_of_players) values (%s)" \
         "returning tournament_id", (num,))
     conn.commit()
     tournamentId = c.fetchone()[0]
@@ -35,7 +35,7 @@ def deletePlayers(tournamentId):
     conn = connect()
     c = conn.cursor()
     # First remove player from the tournament
-    c.execute("delete from tournament_players where tournament_id = (%s)",
+    c.execute("delete from tournament_players where tournament_id = (%s)" \
               "returning player_id", (tournamentId,))
     playerIds = c.fetchall()
     # For each of the entry removed earlier remove them from player table
@@ -67,11 +67,11 @@ def registerPlayer(name, tournamentId):
     c = conn.cursor()
     # First insert the player into the player (check if user already exists 
     # omitted because duplicate names are allowed)
-    c.execute("insert into players (name) values (%s) returning player_id", 
+    c.execute("insert into players (name) values (%s) returning player_id",
               (name,))
     playerId = c.fetchone()[0]
     # Then register the player for the tournament
-    c.execute("insert into tournament_players (tournament_id, player_id)",
+    c.execute("insert into tournament_players (tournament_id, player_id)" \
               "values (%s,%s)", (tournamentId, playerId))
     conn.commit()
     conn.close()
@@ -94,8 +94,8 @@ def playerStandings(tournamentId):
     c = conn.cursor()
     # For a tournament, fetch the players, ordered by total_wins 
     # (desc order, because fetchall() revereses the order)
-    c.execute("select player_id, name, total_wins, total_matches from",
-              "tournament_players_view where tournament_id = (%s) order by",
+    c.execute("select player_id, name, total_wins, total_matches from " \
+              "tournament_players_view where tournament_id = (%s) order by " \
               "total_wins desc", (tournamentId,))
     players = c.fetchall() 
     conn.close()
@@ -112,13 +112,13 @@ def reportMatch(winner, loser, tournamentId):
     conn = connect()
     c = conn.cursor()
     # First start a match, by inserting a new in matches
-    c.execute("insert into matches (tournament_id, player1, player2, winner)",
+    c.execute("insert into matches (tournament_id, player1, player2, winner)" \
               "values (%s, %s, %s, %s)", (tournamentId, winner, loser, winner))
     # Then update the total_matches and total_wins of winner and loser appropriately
-    c.execute("update tournament_players set total_matches = (total_matches + 1)",
+    c.execute("update tournament_players set total_matches = (total_matches + 1)" \
               "where tournament_id = (%s) and player_id = (%s)", (tournamentId, loser));
-    c.execute("update tournament_players set total_matches = (total_matches + 1),",
-              "total_wins = (total_wins + 1) where tournament_id = (%s)",
+    c.execute("update tournament_players set total_matches = (total_matches + 1)," \
+              "total_wins = (total_wins + 1) where tournament_id = (%s)" \
               "and player_id = (%s)", (tournamentId, winner))
     conn.commit()
     conn.close()
@@ -142,7 +142,7 @@ def swissPairings(tournamentId):
     conn = connect()
     c = conn.cursor()
     # First get the name and id of players ordered by wins
-    c.execute("select player_id, name from tournament_players_view where",
+    c.execute("select player_id, name from tournament_players_view where " \
               "tournament_id = (%s) order by total_matches, total_wins desc",
               (tournamentId,))
     players = c.fetchall()

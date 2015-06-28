@@ -22,7 +22,7 @@ def testDelete(tournamentId):
     deletePlayers(tournamentId)
     print "2. Player records can be deleted."
 
-
+tournamentId
 def testCount(tournamentId):
     deleteMatches(tournamentId)
     deletePlayers(tournamentId)
